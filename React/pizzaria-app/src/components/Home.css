@@ -1,0 +1,100 @@
+.home-container {
+  padding: 40px 0;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.cta-buttons .btn {
+  padding: 15px 30px;
+  font-size: 18px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.popular-pizzas {
+  margin-top: 60px;
+}
+
+.popular-pizzas h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 40px;
+  font-size: 2rem;
+}
+
+.pizza-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.pizza-card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.pizza-card:hover {
+  transform: translateY(-5px);
+}
+
+.pizza-image {
+  width: 100%;
+  height: 200px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.pizza-image.margherita {
+  background-image: linear-gradient(45deg, #ff6b6b, #ffa500);
+}
+
+.pizza-image.pepperoni {
+  background-image: linear-gradient(45deg, #ff4757, #ff6b35);
+}
+
+.pizza-image.calabresa {
+  background-image: linear-gradient(45deg, #ff6348, #ff8c00);
+}
+
+.pizza-card h3 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+.pizza-card p {
+  color: #666;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.price {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #ff6b35;
+}
+
+@media (max-width: 768px) {
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .pizza-grid {
+    grid-template-columns: 1fr;
+  }
+} 

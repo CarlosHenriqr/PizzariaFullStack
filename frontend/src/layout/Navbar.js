@@ -1,27 +1,103 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import "./Navbar.css";
 
 export default function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [clienteNome, setClienteNome] = useState("");
+
+  useEffect(() => {
+    setClienteNome(localStorage.getItem("clienteNome") || "");
+  }, [location]);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("clienteId");
+    localStorage.removeItem("clienteNome");
+    setClienteNome("");
+    navigate("/login-cliente");
+  };
+
   return (
-    <div>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div className="container-fluid">
-          <Link className="navbar-brand" to="/">
-            Full Stack Application
-          </Link>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
+    <nav className="navigation">
+      <div className="nav-container">
+        <div className="nav-brand">
+          <Link to="/">🍕 Pizzaria Deliciosa</Link>
         </div>
-      </nav>
-    </div>
+        
+        <button className="navbar-toggler" onClick={toggleMenu}>
+          ☰
+        </button>
+        
+        <div className={`navbar-collapse ${isMenuOpen ? 'show' : ''}`}>
+          <div className="nav-menu">
+            <Link 
+              to="/" 
+              className={`nav-link ${isActive('/') ? 'active' : ''}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link 
+              to="/pizzas" 
+              className={`nav-link ${isActive('/pizzas') ? 'active' : ''}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Cardápio
+            </Link>
+            <Link 
+              to="/carrinho" 
+              className={`nav-link cart-link ${isActive('/carrinho') ? 'active' : ''}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              🛒 Carrinho
+              <span className="cart-count">0</span>
+            </Link>
+            <Link 
+              to="/pedidos" 
+              className={`nav-link ${isActive('/pedidos') ? 'active' : ''}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Meus Pedidos
+            </Link>
+            <Link 
+              to="/admin" 
+              className={`nav-link ${isActive('/admin') ? 'active' : ''}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Admin
+            </Link>
+            {clienteNome ? (
+              <>
+                <span className="nav-link" style={{ color: '#fff', fontWeight: 600 }}>
+                  Olá, {clienteNome.split(" ")[0]}
+                </span>
+                <button className="logout-btn" onClick={handleLogout}>
+                  Sair
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login-cliente" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+                  Entrar
+                </Link>
+                <Link to="/cadastro-cliente" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+                  Cadastrar
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </nav>
   );
 }

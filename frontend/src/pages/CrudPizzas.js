@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/pizzeria-theme.css";
+import { pizzaAPI } from "../services/api";
 
 function CrudPizzas({ modoCriacao }) {
   const [pizzas, setPizzas] = useState([]);
@@ -10,21 +10,28 @@ function CrudPizzas({ modoCriacao }) {
   const [editId, setEditId] = useState(null);
   const [mensagem, setMensagem] = useState("");
   const [tipoMensagem, setTipoMensagem] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const fetchPizzas = () => {
-    fetch("http://localhost:8080/pizzas")
-      .then((r) => r.json())
-      .then(setPizzas)
-      .catch(() => {
-        setMensagem("Erro ao buscar pizzas");
-        setTipoMensagem("error");
-      });
+  const fetchPizzas = async () => {
+    try {
+      setLoading(true);
+      const data = await pizzaAPI.getAll();
+      setPizzas(data);
+    } catch (err) {
+      console.error('Erro ao buscar pizzas:', err);
+      setMensagem("Erro ao buscar pizzas. Verifique se o backend está rodando.");
+      setTipoMensagem("error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchPizzas();
-  }, []);
+    if (!modoCriacao) {
+      fetchPizzas();
+    }
+  }, [modoCriacao]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -33,40 +40,41 @@ function CrudPizzas({ modoCriacao }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMensagem("");
-    const method = editId ? "PUT" : "POST";
-    const url = editId
-      ? `http://localhost:8080/pizzas/${editId}`
-      : "http://localhost:8080/pizzas";
-
+    setLoading(true);
+    
     try {
-      const resp = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nome: form.nome,
-          descricao: form.descricao,
-          preco: Number.parseFloat(form.preco),
-        }),
-      });
+      const pizzaData = {
+        nome: form.nome,
+        descricao: form.descricao,
+        preco: Number.parseFloat(form.preco),
+      };
 
-      if (!resp.ok) throw new Error("Erro ao salvar pizza");
-
-      const successMessage = editId
-        ? "Pizza atualizada com sucesso!"
-        : "Pizza cadastrada com sucesso!";
-      setMensagem(successMessage);
+      if (editId) {
+        await pizzaAPI.update(editId, pizzaData);
+        setMensagem("Pizza atualizada com sucesso!");
+      } else {
+        await pizzaAPI.create(pizzaData);
+        setMensagem("Pizza cadastrada com sucesso!");
+      }
+      
       setTipoMensagem("success");
       setForm({ nome: "", descricao: "", preco: "" });
       setEditId(null);
-      fetchPizzas();
+      
+      if (!modoCriacao) {
+        fetchPizzas();
+      }
 
       // Redirect to home page after creating new item
       if (!editId) {
         setTimeout(() => navigate("/"), 1500);
       }
     } catch (err) {
-      setMensagem("Erro: " + err.message);
+      console.error('Erro ao salvar pizza:', err);
+      setMensagem("Erro ao salvar pizza. Verifique se o backend está rodando.");
       setTipoMensagem("error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,141 +92,155 @@ function CrudPizzas({ modoCriacao }) {
     if (!window.confirm("Deseja realmente excluir esta pizza?")) return;
 
     try {
-      await fetch(`http://localhost:8080/pizzas/${id}`, { method: "DELETE" });
+      setLoading(true);
+      await pizzaAPI.delete(id);
       setMensagem("Pizza excluída com sucesso!");
       setTipoMensagem("success");
       fetchPizzas();
     } catch (err) {
-      setMensagem("Erro ao excluir pizza");
+      console.error('Erro ao excluir pizza:', err);
+      setMensagem("Erro ao excluir pizza. Verifique se o backend está rodando.");
       setTipoMensagem("error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="pizzeria-container">
-      <div className="pizzeria-card">
-        <h1 className="pizzeria-title">
+    <div className="page-container">
+      <div className="container">
+        <h1>
           {modoCriacao ? "🍕 Cadastrar Nova Pizza" : "🍕 Gerenciar Pizzas"}
         </h1>
 
-        <form onSubmit={handleSubmit} className="pizzeria-form">
-          <input
-            name="nome"
-            placeholder="Nome da Pizza (ex: Margherita)"
-            value={form.nome}
-            onChange={handleChange}
-            className="pizzeria-input"
-            required
-          />
-          <input
-            name="descricao"
-            placeholder="Descrição dos ingredientes"
-            value={form.descricao}
-            onChange={handleChange}
-            className="pizzeria-input"
-            required
-          />
-          <input
-            name="preco"
-            type="number"
-            step="0.01"
-            placeholder="Preço (R$)"
-            value={form.preco}
-            onChange={handleChange}
-            className="pizzeria-input"
-            required
-          />
-          <div style={{ display: "flex", gap: "15px", flexWrap: "wrap" }}>
-            <button type="submit" className="pizzeria-btn pizzeria-btn-primary">
-              {editId ? "✏️ Atualizar Pizza" : "➕ Cadastrar Pizza"}
-            </button>
-            {editId && (
-              <button
-                type="button"
-                className="pizzeria-btn pizzeria-btn-secondary"
-                onClick={() => {
-                  setEditId(null);
-                  setForm({ nome: "", descricao: "", preco: "" });
-                  setMensagem("");
-                }}
-              >
-                ❌ Cancelar
+        <div className="form-container">
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="nome">Nome da Pizza</label>
+              <input
+                id="nome"
+                name="nome"
+                placeholder="Ex: Margherita"
+                value={form.nome}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="descricao">Descrição dos Ingredientes</label>
+              <textarea
+                id="descricao"
+                name="descricao"
+                placeholder="Descreva os ingredientes da pizza"
+                value={form.descricao}
+                onChange={handleChange}
+                rows="3"
+                required
+                disabled={loading}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="preco">Preço (R$)</label>
+              <input
+                id="preco"
+                name="preco"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                value={form.preco}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
+            </div>
+            
+            <div className="d-flex gap-3">
+              <button type="submit" className="btn btn-primary" disabled={loading}>
+                {loading ? "⏳ Processando..." : editId ? "✏️ Atualizar Pizza" : "➕ Cadastrar Pizza"}
               </button>
-            )}
-          </div>
-        </form>
+              {editId && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setEditId(null);
+                    setForm({ nome: "", descricao: "", preco: "" });
+                    setMensagem("");
+                  }}
+                  disabled={loading}
+                >
+                  ❌ Cancelar
+                </button>
+              )}
+            </div>
+          </form>
 
-        {mensagem && (
-          <div
-            className={`pizzeria-message ${
-              tipoMensagem === "success"
-                ? "pizzeria-message-success"
-                : "pizzeria-message-error"
-            }`}
-          >
-            {mensagem}
-          </div>
-        )}
+          {mensagem && (
+            <div className={`alert alert-${tipoMensagem === "success" ? "success" : "danger"} mt-3`}>
+              {mensagem}
+            </div>
+          )}
+        </div>
 
         {!modoCriacao && (
-          <div>
-            <h2 className="pizzeria-subtitle">📋 Lista de Pizzas</h2>
-            <div style={{ overflowX: "auto" }}>
-              <table className="pizzeria-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Descrição</th>
-                    <th>Preço</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pizzas.map((pizza) => (
-                    <tr key={pizza.id}>
-                      <td>#{pizza.id}</td>
-                      <td
-                        style={{
-                          fontWeight: "600",
-                          color: "var(--pizzeria-red)",
-                        }}
-                      >
-                        {pizza.nome}
-                      </td>
-                      <td>{pizza.descricao}</td>
-                      <td className="pizzeria-price">
-                        R$ {Number(pizza.preco).toFixed(2)}
-                      </td>
-                      <td>
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: "8px",
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          <button
-                            className="pizzeria-btn pizzeria-btn-secondary"
-                            style={{ padding: "8px 15px", fontSize: "14px" }}
-                            onClick={() => handleEdit(pizza)}
-                          >
-                            ✏️ Editar
-                          </button>
-                          <button
-                            className="pizzeria-btn pizzeria-btn-danger"
-                            style={{ padding: "8px 15px", fontSize: "14px" }}
-                            onClick={() => handleDelete(pizza.id)}
-                          >
-                            🗑️ Excluir
-                          </button>
-                        </div>
-                      </td>
+          <div className="mt-4">
+            <h2>📋 Lista de Pizzas</h2>
+            
+            {loading ? (
+              <div className="loading">Carregando pizzas...</div>
+            ) : pizzas.length === 0 ? (
+              <div className="empty-state">
+                <h3>🍕 Nenhuma pizza cadastrada</h3>
+                <p>Comece cadastrando a primeira pizza!</p>
+              </div>
+            ) : (
+              <div className="table-responsive">
+                <table className="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Nome</th>
+                      <th>Descrição</th>
+                      <th>Preço</th>
+                      <th>Ações</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {pizzas.map((pizza) => (
+                      <tr key={pizza.id}>
+                        <td>#{pizza.id}</td>
+                        <td className="text-primary fw-bold">{pizza.nome}</td>
+                        <td>{pizza.descricao}</td>
+                        <td className="text-success fw-bold">
+                          R$ {Number(pizza.preco).toFixed(2)}
+                        </td>
+                        <td>
+                          <div className="d-flex gap-2">
+                            <button
+                              className="btn btn-primary btn-sm"
+                              onClick={() => handleEdit(pizza)}
+                              disabled={loading}
+                            >
+                              ✏️ Editar
+                            </button>
+                            <button
+                              className="btn btn-danger btn-sm"
+                              onClick={() => handleDelete(pizza.id)}
+                              disabled={loading}
+                            >
+                              🗑️ Excluir
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
       </div>

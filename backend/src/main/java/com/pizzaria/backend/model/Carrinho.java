@@ -12,6 +12,10 @@ public class Carrinho {
     @OneToMany(mappedBy = "carrinho", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemCarrinho> itens;
 
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
+
     // Getters e Setters
     public Long getId() {
         return id;
@@ -27,5 +31,13 @@ public class Carrinho {
 
     public void setItens(List<ItemCarrinho> itens) {
         this.itens = itens;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 }

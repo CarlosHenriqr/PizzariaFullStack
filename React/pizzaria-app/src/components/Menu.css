@@ -1,0 +1,310 @@
+.menu-container {
+  padding: 40px 0;
+}
+
+.menu-container h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 2.5rem;
+}
+
+.menu-container > .container > p {
+  text-align: center;
+  color: #666;
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+}
+
+.pizzas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
+}
+
+.pizza-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.pizza-card:hover {
+  transform: translateY(-5px);
+}
+
+.pizza-image {
+  width: 100%;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.pizza-image.margherita {
+  background-image: linear-gradient(45deg, #ff6b6b, #ffa500);
+}
+
+.pizza-image.pepperoni {
+  background-image: linear-gradient(45deg, #ff4757, #ff6b35);
+}
+
+.pizza-image.calabresa {
+  background-image: linear-gradient(45deg, #ff6348, #ff8c00);
+}
+
+.pizza-image.quatro-queijos {
+  background-image: linear-gradient(45deg, #ffd700, #ffa500);
+}
+
+.pizza-image.portuguesa {
+  background-image: linear-gradient(45deg, #32cd32, #228b22);
+}
+
+.pizza-image.frango-catupiry {
+  background-image: linear-gradient(45deg, #ffb6c1, #ff69b4);
+}
+
+.pizza-info {
+  padding: 20px;
+}
+
+.pizza-info h3 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+.pizza-info p {
+  color: #666;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.ingredients {
+  margin-bottom: 15px;
+}
+
+.ingredients strong {
+  color: #333;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.ingredients ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ingredients li {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+}
+
+.ingredients li:before {
+  content: "• ";
+  color: #ff6b35;
+}
+
+.price {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #ff6b35;
+  margin-bottom: 15px;
+}
+
+.pizza-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.pizza-actions .btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 15px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+  color: #333;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.base-pizza {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.base-pizza h3 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.customization-section {
+  margin-bottom: 20px;
+}
+
+.customization-section h3 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.ingredients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.ingredient-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ingredient-checkbox:hover {
+  background-color: #f8f9fa;
+}
+
+.ingredient-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+.selected-ingredients {
+  background: #e8f5e8;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.selected-ingredients h3 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.selected-ingredients ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.selected-ingredients li {
+  margin-bottom: 5px;
+  padding: 5px 0;
+}
+
+.base-ingredient {
+  color: #333;
+  font-weight: 500;
+}
+
+.custom-ingredient {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.final-price {
+  background: #ff6b35;
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.final-price h3 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 15px;
+  padding: 20px;
+  border-top: 1px solid #eee;
+}
+
+.modal-footer .btn {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .pizzas-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .pizza-actions {
+    flex-direction: column;
+  }
+  
+  .ingredients-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+  }
+} 

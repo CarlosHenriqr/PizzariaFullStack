@@ -4,6 +4,7 @@ import com.pizzaria.backend.model.Carrinho;
 import com.pizzaria.backend.model.ItemCarrinho;
 import com.pizzaria.backend.repository.CarrinhoRepository;
 import com.pizzaria.backend.repository.ItemCarrinhoRepository;
+import com.pizzaria.backend.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +20,23 @@ public class CarrinhoController {
     private CarrinhoRepository carrinhoRepository;
     @Autowired
     private ItemCarrinhoRepository itemCarrinhoRepository;
+    @Autowired
+    private ClienteRepository clienteRepository;
 
     // Adicionar pizza ao carrinho
     @PostMapping
-    public ResponseEntity<ItemCarrinho> adicionarItem(@RequestBody ItemCarrinho item) {
-        Carrinho carrinho = carrinhoRepository.findById(item.getCarrinho().getId()).orElse(null);
+    public ResponseEntity<ItemCarrinho> adicionarItem(@RequestParam Long clienteId, @RequestBody ItemCarrinho item) {
+        Carrinho carrinho = null;
+        // Buscar carrinho existente para o cliente
+        List<Carrinho> carrinhosCliente = carrinhoRepository.findAll().stream()
+            .filter(c -> c.getCliente() != null && c.getCliente().getId().equals(clienteId))
+            .toList();
+        if (!carrinhosCliente.isEmpty()) {
+            carrinho = carrinhosCliente.get(0);
+        }
         if (carrinho == null) {
             carrinho = new Carrinho();
+            carrinho.setCliente(clienteRepository.findById(clienteId).orElse(null));
             carrinho = carrinhoRepository.save(carrinho);
         }
         item.setCarrinho(carrinho);
