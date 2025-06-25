@@ -15,6 +15,13 @@ function PainelAdmin() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const email = localStorage.getItem("clienteEmail");
+    if (email !== "admin@email.com") {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     Promise.all([
       fetch("http://localhost:8080/clientes").then((r) => r.json()),
       fetch("http://localhost:8080/pizzas").then((r) => r.json()),
@@ -173,6 +180,13 @@ function PainelAdmin() {
                     </td>
                     <td>
                       <button
+                        className="pizzeria-btn pizzeria-btn-primary"
+                        style={{ padding: "6px 12px", fontSize: "12px", marginRight: "6px" }}
+                        onClick={() => navigate(`/editar-pizza/${p.id}`)}
+                      >
+                        ✏️ Editar
+                      </button>
+                      <button
                         className="pizzeria-btn pizzeria-btn-danger"
                         style={{ padding: "6px 12px", fontSize: "12px" }}
                         onClick={() => handleDelete("pizza", p.id)}
@@ -196,7 +210,7 @@ function PainelAdmin() {
               style={{ padding: "8px 16px", fontSize: "14px" }}
               onClick={() => navigate("/novo-carrinho")}
             >
-              ➕ Novo
+              
             </button>
           </div>
           <div style={{ overflowX: "auto" }}>
@@ -225,7 +239,7 @@ function PainelAdmin() {
                             }}
                           >
                             Pizza #{i.pizzaId} - Qtd: {i.quantidade} -
-                            <span style={{ color: "var(--pizzeria-red)" }}>
+                            <span style={{ color: "var(--pizzeria-orange)" }}>
                               R$ {Number(i.preco).toFixed(2)}
                             </span>
                           </div>
@@ -257,7 +271,6 @@ function PainelAdmin() {
               style={{ padding: "8px 16px", fontSize: "14px" }}
               onClick={() => navigate("/novo-pedido")}
             >
-              ➕ Novo
             </button>
           </div>
           <div style={{ overflowX: "auto" }}>

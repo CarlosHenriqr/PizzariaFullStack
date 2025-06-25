@@ -2,15 +2,19 @@ package com.pizzaria.backend.controller;
 
 import com.pizzaria.backend.model.Carrinho;
 import com.pizzaria.backend.model.ItemCarrinho;
+import com.pizzaria.backend.model.Pizza;
 import com.pizzaria.backend.repository.CarrinhoRepository;
 import com.pizzaria.backend.repository.ItemCarrinhoRepository;
 import com.pizzaria.backend.repository.ClienteRepository;
+import com.pizzaria.backend.repository.PizzaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/carrinho")
@@ -22,6 +26,8 @@ public class CarrinhoController {
     private ItemCarrinhoRepository itemCarrinhoRepository;
     @Autowired
     private ClienteRepository clienteRepository;
+    @Autowired
+    private PizzaRepository pizzaRepository;
 
     // Adicionar pizza ao carrinho
     @PostMapping
@@ -46,11 +52,25 @@ public class CarrinhoController {
 
     // Listar itens do carrinho
     @GetMapping("/{carrinhoId}")
-    public ResponseEntity<List<ItemCarrinho>> listarItens(@PathVariable Long carrinhoId) {
+    public ResponseEntity<List<Map<String, Object>>> listarItens(@PathVariable Long carrinhoId) {
         Carrinho carrinho = carrinhoRepository.findById(carrinhoId).orElse(null);
         if (carrinho == null)
             return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(carrinho.getItens());
+        List<ItemCarrinho> itens = carrinho.getItens();
+        List<Map<String, Object>> itensComNome = itens.stream().map(item -> {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", item.getId());
+            map.put("pizzaId", item.getPizzaId());
+            map.put("quantidade", item.getQuantidade());
+            map.put("preco", item.getPreco());
+            Pizza pizza = null;
+            if (item.getPizzaId() != null) {
+                pizza = pizzaRepository.findById(item.getPizzaId()).orElse(null);
+            }
+            map.put("pizzaNome", pizza != null ? pizza.getNome() : null);
+            return map;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(itensComNome);
     }
 
     // Remover item do carrinho

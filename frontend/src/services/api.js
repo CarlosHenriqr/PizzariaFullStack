@@ -158,11 +158,13 @@ export const checkBackendStatus = async () => {
   }
 };
 
-export default {
+const api = {
   pizzaAPI,
   carrinhoAPI,
   clienteAPI,
   pedidoAPI,
   userAPI,
   checkBackendStatus,
-}; 
+};
+
+export default api; 

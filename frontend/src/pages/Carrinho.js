@@ -33,7 +33,29 @@ function Carrinho() {
         try {
           setLoading(true);
           const data = await carrinhoAPI.getItens(carrinhoId);
-          setItens(data);
+          // Buscar detalhes das pizzas para cada item
+          const pizzasMap = {};
+          for (const item of data) {
+            const pizzaIdNum = Number(item.pizzaId);
+            if (pizzaIdNum && !pizzasMap[pizzaIdNum]) {
+              try {
+                pizzasMap[pizzaIdNum] = await pizzaAPI.getById(pizzaIdNum);
+              } catch (e) {
+                pizzasMap[pizzaIdNum] = null;
+              }
+            }
+          }
+          // Adiciona detalhes ao item
+          const itensComDetalhes = data.map(item => {
+            const pizzaIdNum = Number(item.pizzaId);
+            return {
+              ...item,
+              pizzaNome: pizzasMap[pizzaIdNum]?.nome || item.pizzaNome || `Pizza não encontrada (id: ${item.pizzaId})`,
+              pizzaDescricao: pizzasMap[pizzaIdNum]?.descricao || '',
+              pizzaPreco: pizzasMap[pizzaIdNum]?.preco || item.preco
+            }
+          });
+          setItens(itensComDetalhes);
         } catch (err) {
           console.error('Erro ao carregar itens do carrinho:', err);
           setItens([]);
@@ -182,7 +204,7 @@ function Carrinho() {
             </div>
             
             <div className="form-group">
-              <label htmlFor="preco">Preço Unitário (R$)</label>
+              <label htmlFor="preco">Valor(R$)</label>
               <input
                 id="preco"
                 type="number"
@@ -190,9 +212,9 @@ function Carrinho() {
                 step={0.01}
                 placeholder="0.00"
                 value={preco}
-                onChange={(e) => setPreco(e.target.value)}
                 required
                 disabled={loading}
+                readOnly
               />
             </div>
             
@@ -217,7 +239,6 @@ function Carrinho() {
               <table className="table table-striped">
                 <thead>
                   <tr>
-                    <th>ID</th>
                     <th>Pizza</th>
                     <th>Quantidade</th>
                     <th>Preço Unit.</th>
@@ -227,12 +248,12 @@ function Carrinho() {
                 </thead>
                 <tbody>
                   {itens.map((item) => {
-                    const pizza = pizzas.find(p => p.id === item.pizzaId);
                     return (
                       <tr key={item.id || Math.random()}>
-                        <td>#{item.id}</td>
                         <td className="text-primary fw-bold">
-                          {pizza ? pizza.nome : `Pizza #${item.pizzaId}`}
+                          {item.pizzaNome ? item.pizzaNome : `Pizza não encontrada (id: ${item.pizzaId})`}
+                          <br />
+                          <small>{item.pizzaDescricao}</small>
                         </td>
                         <td>
                           <input
@@ -252,7 +273,7 @@ function Carrinho() {
                         <td className="text-success fw-bold">
                           R$ {Number(item.preco || 0).toFixed(2)}
                         </td>
-                        <td className="text-primary fw-bold">
+                        <td className="text-danger fw-bold">
                           R$ {(
                             Number(item.preco || 0) * Number(item.quantidade || 0)
                           ).toFixed(2)}

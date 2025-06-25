@@ -18,8 +18,7 @@ import LoginCliente from "./pages/LoginCliente";
 import CadastroCliente from "./pages/CadastroCliente";
 
 function App() {
-  // Exemplo: clienteId e carrinhoId fixos para teste
-  const [clienteId] = React.useState(localStorage.getItem("clienteId") || 1);
+  // const [clienteId] = React.useState(localStorage.getItem("clienteId") || 1);
   const [carrinhoId] = React.useState(1);
   
   return (
@@ -37,6 +36,7 @@ function App() {
             <Route exact path="/novo-cliente" element={<ClienteCadastro />} />
             <Route exact path="/nova-pizza" element={<CrudPizzas modoCriacao={true} />} />
             <Route exact path="/gerenciar-pizzas" element={<CrudPizzas modoCriacao={false} />} />
+            <Route exact path="/editar-pizza/:id" element={<CrudPizzas modoCriacao={false} />} />
             <Route exact path="/users" element={<AddUser />} />
             <Route exact path="/edituser/:id" element={<EditUser />} />
             <Route exact path="/viewuser/:id" element={<ViewUser />} />

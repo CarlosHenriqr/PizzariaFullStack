@@ -19,6 +19,7 @@ export default function LoginCliente() {
       if (cliente) {
         localStorage.setItem("clienteId", cliente.id);
         localStorage.setItem("clienteNome", cliente.nome);
+        localStorage.setItem("clienteEmail", cliente.email);
         // Buscar carrinho do cliente
         const carrinhos = await carrinhoAPI.getAll();
         const carrinho = carrinhos.find((c) => c.cliente && c.cliente.id === cliente.id);

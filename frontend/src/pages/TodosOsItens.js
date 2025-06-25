@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { pizzaAPI } from "../services/api";
+import { Link, useNavigate } from "react-router-dom";
+import { pizzaAPI, carrinhoAPI } from "../services/api";
 
 function TodosOsItens() {
   const [pizzas, setPizzas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [mensagem, setMensagem] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPizzas = async () => {
@@ -24,6 +26,24 @@ function TodosOsItens() {
 
     fetchPizzas();
   }, []);
+
+  // Função para adicionar pizza ao carrinho
+  const handleAdicionarCarrinho = async (pizza) => {
+    setMensagem("");
+    try {
+      const clienteId = localStorage.getItem("clienteId") || 1;
+      const itemData = {
+        pizzaId: pizza.id,
+        quantidade: 1,
+        preco: pizza.preco
+      };
+      await carrinhoAPI.adicionarItem(itemData, clienteId);
+      setMensagem(`Pizza '${pizza.nome}' adicionada ao carrinho!`);
+      setTimeout(() => navigate("/carrinho"), 700); // Redireciona após breve delay
+    } catch (err) {
+      setMensagem("Erro ao adicionar ao carrinho. Verifique se está logado e se o backend está rodando.");
+    }
+  };
 
   return (
     <div className="page-container">
@@ -73,12 +93,13 @@ function TodosOsItens() {
                   </div>
                   <div className="price">R$ {Number(pizza.preco).toFixed(2)}</div>
                   <div className="pizza-actions">
-                    <Link to="/carrinho" className="btn btn-primary">
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => handleAdicionarCarrinho(pizza)}
+                      type="button"
+                    >
                       🛒 Adicionar ao Carrinho
-                    </Link>
-                    <Link to={`/admin`} className="btn btn-secondary">
-                      📋 Ver Detalhes
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -91,6 +112,12 @@ function TodosOsItens() {
             🛒 Ver Meu Carrinho
           </Link>
         </div>
+
+        {mensagem && (
+          <div className={`alert alert-${mensagem.includes('adicionada') ? 'success' : 'danger'}`}>
+            {mensagem}
+          </div>
+        )}
       </div>
     </div>
   );

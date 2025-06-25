@@ -7,9 +7,11 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [clienteNome, setClienteNome] = useState("");
+  const [clienteEmail, setClienteEmail] = useState("");
 
   useEffect(() => {
     setClienteNome(localStorage.getItem("clienteNome") || "");
+    setClienteEmail(localStorage.getItem("clienteEmail") || "");
   }, [location]);
 
   const toggleMenu = () => {
@@ -23,7 +25,9 @@ export default function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("clienteId");
     localStorage.removeItem("clienteNome");
+    localStorage.removeItem("clienteEmail");
     setClienteNome("");
+    setClienteEmail("");
     navigate("/login-cliente");
   };
 
@@ -31,7 +35,7 @@ export default function Navbar() {
     <nav className="navigation">
       <div className="nav-container">
         <div className="nav-brand">
-          <Link to="/">🍕 Pizzaria Deliciosa</Link>
+          <Link to="/">🍕 Pizza Ria</Link>
         </div>
         
         <button className="navbar-toggler" onClick={toggleMenu}>
@@ -60,7 +64,7 @@ export default function Navbar() {
               onClick={() => setIsMenuOpen(false)}
             >
               🛒 Carrinho
-              <span className="cart-count">0</span>
+              <span className=""></span>
             </Link>
             <Link 
               to="/pedidos" 
@@ -69,13 +73,15 @@ export default function Navbar() {
             >
               Meus Pedidos
             </Link>
-            <Link 
-              to="/admin" 
-              className={`nav-link ${isActive('/admin') ? 'active' : ''}`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Admin
-            </Link>
+            {clienteEmail === "admin@email.com" && (
+              <Link 
+                to="/admin" 
+                className={`nav-link ${isActive('/admin') ? 'active' : ''}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Admin
+              </Link>
+            )}
             {clienteNome ? (
               <>
                 <span className="nav-link" style={{ color: '#fff', fontWeight: 600 }}>
