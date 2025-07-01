@@ -1,3 +1,22 @@
+package com.pizzaria.backend.controller;
+
+import com.pizzaria.backend.model.Carrinho;
+import com.pizzaria.backend.model.ItemCarrinho;
+import com.pizzaria.backend.model.Pizza;
+import com.pizzaria.backend.repository.CarrinhoRepository;
+import com.pizzaria.backend.repository.ItemCarrinhoRepository;
+import com.pizzaria.backend.repository.ClienteRepository;
+import com.pizzaria.backend.repository.PizzaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.Map;
+
+
 @RestController
 @RequestMapping("/carrinho")
 @CrossOrigin(origins = { "http://localhost:80", "http://localhost:3000" }) // Permite requisições de múltiplas origens (CORS)
